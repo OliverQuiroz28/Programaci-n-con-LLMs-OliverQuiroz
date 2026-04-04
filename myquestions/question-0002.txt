@@ -1,1 +1,43 @@
+Enunciado:
+En una cooperativa agrícola, se registran mediciones de campo para cada parcela cultivada, incluyendo el nivel de nitrógeno en el suelo (mg/kg), humedad del suelo (%), temperatura ambiental (°C), índice de área foliar (IAF) y días desde el último riego. Sin embargo, los datos suelen contener valores nulos y registros duplicados.
+Se requiere implementar una función que reciba un DataFrame con estas mediciones, realice una limpieza (eliminar duplicados y filas con valores nulos), y luego clasifique cada parcela según su necesidad de intervención con las siguientes reglas:
 
+"urgente": nitrogeno < 20 o humedad < 25
+"moderada": temperatura >= 35 o dias_ultimo_riego >= 7 (y no cumple la condición de "urgente")
+"sin_intervencion": en cualquier otro caso
+
+La función debe retornar un nuevo DataFrame limpio con una columna adicional llamada "intervencion" que contenga la categoría asignada, y las filas deben quedar ordenadas por dias_ultimo_riego de forma ascendente, reiniciando el índice.
+Función a implementar:
+
+Nombre: clasificar_parcelas
+Argumentos:
+
+df (pd.DataFrame): DataFrame con columnas ["nitrogeno", "humedad", "temperatura", "iaf", "dias_ultimo_riego"]. Puede contener valores nulos y filas duplicadas.
+
+
+Retorna: (pd.DataFrame) DataFrame limpio, sin nulos ni duplicados, con columna adicional "intervencion" (valores: "urgente", "moderada", "sin_intervencion"), ordenado por dias_ultimo_riego ascendente y con índice reiniciado (reset_index con drop=True).
+
+Ejemplo:
+pythonimport pandas as pd
+
+df = pd.DataFrame({
+    "nitrogeno":        [35, 15, 15, 40,  None, 28],
+    "humedad":          [30, 20, 20, 60,  45,   55],
+    "temperatura":      [28, 22, 22, 37,  30,   25],
+    "iaf":              [3.2, 1.8, 1.8, 4.1, 2.5, 3.8],
+    "dias_ultimo_riego":[3,   1,   1,   8,   5,   9 ]
+})
+
+resultado = clasificar_parcelas(df)
+print(resultado)
+#    nitrogeno  humedad  temperatura  iaf  dias_ultimo_riego   intervencion
+# 0       15.0     20.0         22.0  1.8                1.0        urgente
+# 1       35.0     30.0         28.0  3.2                3.0  sin_intervencion
+# 2       40.0     60.0         37.0  4.1                8.0       moderada
+# 3       28.0     55.0         25.0  3.8                9.0       moderada
+Notas/Restricciones:
+
+Usar operaciones vectorizadas de pandas (evitar loops explícitos con for).
+Se recomienda usar np.select o aplicaciones condicionales con .loc para asignar la intervención.
+El orden de evaluación de condiciones importa: primero evaluar "urgente", luego "moderada", luego "sin_intervencion".
+Librerías permitidas: pandas, numpy.
