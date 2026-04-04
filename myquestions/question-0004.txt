@@ -1,1 +1,44 @@
+Enunciado:
+En una empresa minera, se registran mediciones operativas de cada frente de extracción, incluyendo la concentración de polvo en el aire (mg/m³), nivel de gases tóxicos (ppm), temperatura interior del túnel (°C), nivel de ruido (dB) y horas de operación continua del turno. Sin embargo, los datos suelen contener valores nulos y registros duplicados.
+Se requiere implementar una función que reciba un DataFrame con estas mediciones, realice una limpieza (eliminar duplicados y filas con valores nulos), escale las columnas numéricas al rango [0, 1] usando MinMaxScaler, y luego clasifique cada frente según su nivel de riesgo aplicando las reglas sobre los valores originales (antes del escalado):
 
+"peligroso": gases_toxicos >= 50 o temperatura_tunel >= 38
+"precaucion": polvo_aire >= 5 o ruido_db >= 90 (y no cumple la condición de "peligroso")
+"seguro": en cualquier otro caso
+
+La función debe retornar un nuevo DataFrame donde las columnas numéricas estén escaladas, con una columna adicional llamada "nivel_riesgo" asignada según los valores originales, y las filas ordenadas por horas_operacion original de forma ascendente, reiniciando el índice.
+Función a implementar:
+
+Nombre: clasificar_frentes_mineros
+Argumentos:
+
+df (pd.DataFrame): DataFrame con columnas ["polvo_aire", "gases_toxicos", "temperatura_tunel", "ruido_db", "horas_operacion"]. Puede contener valores nulos y filas duplicadas.
+
+
+Retorna: (pd.DataFrame) DataFrame limpio, sin nulos ni duplicados, con columnas numéricas escaladas con MinMaxScaler, columna adicional "nivel_riesgo" (valores: "peligroso", "precaucion", "seguro") asignada sobre valores originales, ordenado por horas_operacion original ascendente y con índice reiniciado (reset_index con drop=True).
+
+Ejemplo:
+pythonimport pandas as pd
+
+df = pd.DataFrame({
+    "polvo_aire":        [3.2, 6.5, 6.5, 2.1, None, 4.8],
+    "gases_toxicos":     [20,  35,  35,  55,  28,   15 ],
+    "temperatura_tunel": [30,  33,  33,  40,  36,   29 ],
+    "ruido_db":          [85,  95,  95,  88,  82,   91 ],
+    "horas_operacion":   [4,   2,   2,   7,   5,    6  ]
+})
+
+resultado = clasificar_frentes_mineros(df)
+print(resultado)
+#    polvo_aire  gases_toxicos  temperatura_tunel  ruido_db  horas_operacion  nivel_riesgo
+# 0        0.00           0.25               0.09      0.23             0.00        seguro
+# 1        0.98           0.50               0.36      1.00             0.67    precaucion
+# 2        0.79           0.00               0.00      0.69             0.33        seguro
+# 3        1.00           1.00               1.00      0.46             1.00     peligroso
+Notas/Restricciones:
+
+Usar MinMaxScaler de sklearn.preprocessing para escalar todas las columnas numéricas.
+Las reglas condicionales para asignar "nivel_riesgo" deben evaluarse sobre los valores originales (antes del escalado), usando np.select o .loc.
+El orden de evaluación de condiciones importa: primero "peligroso", luego "precaucion", luego "seguro".
+Ordenar por horas_operacion original antes de escalar.
+Librerías permitidas: pandas, numpy, sklearn.
