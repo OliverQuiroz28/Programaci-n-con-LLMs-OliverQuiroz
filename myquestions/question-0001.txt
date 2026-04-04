@@ -1,1 +1,33 @@
+Enunciado: En una planta industrial, se recolectan datos de sensores de turbinas que incluyen frecuencia de vibración (Hz), temperatura del rodamiento (°C), amplitud de oscilación (mm), voltaje de alimentación (V) y horas de operación acumuladas. Sin embargo, los datos suelen contener valores nulos y registros duplicados.
+Se requiere implementar una función que reciba un DataFrame con estos datos, realice una limpieza (eliminar duplicados y filas con valores nulos), y luego segmente cada lectura en niveles de alerta según las siguientes reglas:
+•	"critico": frecuencia_vibracion >= 80 o temperatura_rodamiento >= 90
+•	"advertencia": frecuencia_vibracion >= 50 o temperatura_rodamiento >= 70 (y no cumple la condición de "critico")
+•	"normal": en cualquier otro caso
+La función debe retornar un nuevo DataFrame limpio con una columna adicional llamada "nivel_alerta" que contenga la categoría asignada, y las filas deben quedar ordenadas por horas_operacion de forma ascendente, reiniciando el índice.
+Función a implementar:
+•	Nombre: clasificar_estado_turbina
+•	Argumentos: 
+o	df (pd.DataFrame): DataFrame con columnas ["frecuencia_vibracion", "temperatura_rodamiento", "amplitud_oscilacion", "voltaje", "horas_operacion"]. Puede contener valores nulos y filas duplicadas.
+•	Retorna: (pd.DataFrame) DataFrame limpio, sin nulos ni duplicados, con columna adicional "nivel_alerta" (valores: "critico", "advertencia", "normal"), ordenado por horas_operacion ascendente y con índice reiniciado (reset_index con drop=True)
+Ejemplo:
+import pandas as pd
+df = pd.DataFrame({
+    "frecuencia_vibracion":  [85, 40, 40, 55, None, 72],
+    "temperatura_rodamiento":[95, 60, 60, 75, 65,   88],
+    "amplitud_oscilacion":   [2.1, 0.5, 0.5, 1.2, 0.8, 1.8],
+    "voltaje":               [220, 218, 218, 221, 219, 217],
+    "horas_operacion":       [1200, 300, 300, 750, 500, 980]
+})
+resultado = clasificar_estado_turbina(df)
+print(resultado)
+#    frecuencia_vibracion  temperatura_rodamiento  amplitud_oscilacion  voltaje  horas_operacion nivel_alerta
+# 0                  40.0                    60.0                  0.5    218.0            300.0       normal
+# 1                  55.0                    75.0                  1.2    221.0            750.0  advertencia
+# 2                  72.0                    88.0                  1.8    217.0            980.0  advertencia
+# 3                  85.0                    95.0                  2.1    220.0           1200.0      critico
+Notas/Restricciones:
 
+Usar operaciones vectorizadas de pandas (evitar loops explícitos con for).
+Se recomienda usar np.select o aplicaciones condicionales con .loc para asignar el nivel.
+El orden de evaluación de condiciones importa: primero evaluar "critico", luego "advertencia", luego "normal".
+Librerías permitidas: pandas, numpy.
